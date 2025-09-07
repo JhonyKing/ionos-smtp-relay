@@ -57,8 +57,9 @@ curl -s http://localhost:10000/health
 ```
 
 **Respuesta:**
+
 ```json
-{"status":"ok"}
+{ "status": "ok" }
 ```
 
 ### Enviar Email Simple
@@ -105,6 +106,7 @@ curl -X POST http://localhost:10000/send \
 ```
 
 **Respuesta exitosa:**
+
 ```json
 {
   "messageId": "<12345@ionos.com>",
@@ -116,12 +118,14 @@ curl -X POST http://localhost:10000/send \
 ## Configuración SMTP IONOS
 
 ### Opción 1: Puerto 587 con STARTTLS (Recomendado)
+
 ```env
 SMTP_PORT=587
 SMTP_SECURE=false
 ```
 
 ### Opción 2: Puerto 465 con SSL
+
 ```env
 SMTP_PORT=465
 SMTP_SECURE=true
@@ -135,14 +139,14 @@ SMTP_SECURE=true
 
 ## Códigos de Error
 
-| Código | Descripción |
-|--------|-------------|
-| 400 | Request malformada |
-| 401 | Error de autenticación SMTP |
-| 422 | Datos de entrada inválidos |
-| 429 | Rate limit excedido |
-| 502 | Error de conexión SMTP |
-| 500 | Error interno del servidor |
+| Código | Descripción                 |
+| ------ | --------------------------- |
+| 400    | Request malformada          |
+| 401    | Error de autenticación SMTP |
+| 422    | Datos de entrada inválidos  |
+| 429    | Rate limit excedido         |
+| 502    | Error de conexión SMTP      |
+| 500    | Error interno del servidor  |
 
 ## Despliegue en Render
 
@@ -165,6 +169,7 @@ En el Dashboard de Render, crear los siguientes secrets:
 ### 3. Variables de entorno automáticas
 
 El blueprint configura automáticamente:
+
 - `SMTP_HOST=smtp.ionos.com`
 - `SMTP_PORT=587`
 - `SMTP_SECURE=false`
@@ -174,28 +179,35 @@ El blueprint configura automáticamente:
 ## Troubleshooting
 
 ### Error de autenticación
+
 ```
 Error 401: Error de autenticación SMTP
 ```
+
 - Verificar `SMTP_USER` y `SMTP_PASS`
 - Asegurar que la cuenta IONOS tenga SMTP habilitado
 
 ### Error de conexión
+
 ```
 Error 502: Error de conexión con el servidor SMTP
 ```
+
 - Verificar `SMTP_HOST=smtp.ionos.com`
 - Probar puerto 465 con `SMTP_SECURE=true`
 - Revisar firewall/proxy
 
 ### Email rechazado
+
 ```
 Error 422: Dirección de email inválida o rechazada
 ```
+
 - Verificar formato de emails en campo `to`
 - Confirmar que el dominio `FROM_EMAIL` esté verificado en IONOS
 
 ### Timeout
+
 - Aumentar timeout en configuración de red
 - Verificar conexión a internet
 

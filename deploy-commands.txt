@@ -1,0 +1,32 @@
+# COMANDOS PARA DESPLEGAR EN GITHUB Y RENDER
+
+## 1. CREAR REPOSITORIO EN GITHUB (MANUAL)
+Ve a: https://github.com/new
+- Repository name: ionos-smtp-relay
+- Description: Micro-servicio HTTP para envío de emails usando IONOS SMTP
+- Public: ✅ SÍ
+- Initialize with README: ❌ NO
+
+## 2. SUBIR CÓDIGO A GITHUB (EJECUTAR DESPUÉS DE CREAR EL REPO)
+git branch -M main
+git remote add origin https://github.com/TU_USUARIO/ionos-smtp-relay.git
+git push -u origin main
+
+## 3. COMANDOS PARA PROBAR LOCALMENTE (OPCIONAL)
+# Crear archivo .env con credenciales reales antes de ejecutar
+npm start
+# En otra terminal:
+curl http://localhost:10000/health
+curl -X POST http://localhost:10000/send -H "Content-Type: application/json" -d '{"to":"test@example.com","subject":"Test","text":"Hello"}'
+
+## 4. DESPLIEGUE EN RENDER
+Una vez subido a GitHub, el asistente procederá con MCP de Render para:
+- Crear servicio web
+- Configurar variables de entorno
+- Configurar secrets SMTP
+- Desplegar automáticamente
+
+## 5. PRUEBAS FINALES
+Una vez desplegado:
+curl https://TU-SERVICIO.onrender.com/health
+curl -X POST https://TU-SERVICIO.onrender.com/send -H "Content-Type: application/json" -d '{"to":"ganaconinteligenciaartificial@gmail.com","subject":"Prueba desde IONOS","text":"¡Funciona!"}'
