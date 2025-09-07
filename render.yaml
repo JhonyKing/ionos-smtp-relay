@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: ionos-smtp-relay
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: "npm ci"
+    startCommand: "node server.js"
+    healthCheckPath: "/health"
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: SMTP_HOST
+        value: smtp.ionos.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_SECURE
+        value: "false"
+      - key: FROM_EMAIL
+        value: "No Reply <direcciongeneral@piensaajedrez.com>"
+      - key: RATE_LIMIT_WINDOW_MS
+        value: "60000"
+      - key: RATE_LIMIT_MAX
+        value: "30"
+      - key: SMTP_USER
+        fromSecret: smtp_user
+      - key: SMTP_PASS
+        fromSecret: smtp_pass
