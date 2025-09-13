@@ -7,6 +7,7 @@ const rateLimit = require("express-rate-limit");
 const pino = require("pino");
 const pinoHttp = require("pino-http");
 const { validateSendEmail } = require("./src/validate");
+const { appendToSent, buildRFC822Message } = require("./src/imap");
 
 // Configuración del logger
 const logger = pino({
@@ -26,7 +27,7 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 // Configurar trust proxy para Cloudflare/Render
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 // Middleware de logging con request ID
 const httpLogger = pinoHttp({
@@ -42,9 +43,7 @@ app.use(httpLogger);
 
 // Función para extraer IP real detrás de proxies
 const getRealIP = (req) => {
-  return req.headers['cf-connecting-ip'] || 
-         req.headers['x-real-ip'] || 
-         req.ip;
+  return req.headers["cf-connecting-ip"] || req.headers["x-real-ip"] || req.ip;
 };
 
 // Rate limiting para el endpoint /send
@@ -193,6 +192,23 @@ app.post("/send", sendRateLimit, async (req, res) => {
 
     // Enviar el email
     const info = await transporter.sendMail(mailOptions);
+
+    // Hook IMAP: Guardar copia en "Enviados" (no bloquear respuesta si falla)
+    if (process.env.SAVE_SENT_COPY === 'true') {
+      try {
+        // Construir mensaje RFC822 raw
+        const raw = buildRFC822Message(mailOptions, process.env.FROM_EMAIL);
+        
+        // Ejecutar append de forma asíncrona sin bloquear la respuesta
+        appendToSent({ raw, logger: req.log }).catch(err => {
+          req.log.warn({ reqId, error: err?.message }, '[IMAP] Append falló');
+        });
+        
+        req.log.info({ reqId }, '[IMAP] Append iniciado en background');
+      } catch (imapError) {
+        req.log.warn({ reqId, error: imapError?.message }, '[IMAP] Error preparando append');
+      }
+    }
 
     req.log.info(
       {
