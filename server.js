@@ -25,6 +25,9 @@ const logger = pino({
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+// Configurar trust proxy para Cloudflare/Render
+app.set('trust proxy', 1);
+
 // Middleware de logging con request ID
 const httpLogger = pinoHttp({
   logger,
@@ -37,10 +40,18 @@ app.use(cors());
 app.use(express.json({ limit: "10mb" })); // Limite para attachments
 app.use(httpLogger);
 
+// Función para extraer IP real detrás de proxies
+const getRealIP = (req) => {
+  return req.headers['cf-connecting-ip'] || 
+         req.headers['x-real-ip'] || 
+         req.ip;
+};
+
 // Rate limiting para el endpoint /send
 const sendRateLimit = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 60000, // 1 minuto por defecto
   max: parseInt(process.env.RATE_LIMIT_MAX) || 30, // 30 requests por minuto por defecto
+  keyGenerator: getRealIP,
   message: {
     error: "Demasiadas solicitudes. Intente nuevamente en un momento.",
     retryAfter: Math.ceil(
