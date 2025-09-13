@@ -194,19 +194,22 @@ app.post("/send", sendRateLimit, async (req, res) => {
     const info = await transporter.sendMail(mailOptions);
 
     // Hook IMAP: Guardar copia en "Enviados" (no bloquear respuesta si falla)
-    if (process.env.SAVE_SENT_COPY === 'true') {
+    if (process.env.SAVE_SENT_COPY === "true") {
       try {
         // Construir mensaje RFC822 raw
         const raw = buildRFC822Message(mailOptions, process.env.FROM_EMAIL);
-        
+
         // Ejecutar append de forma asíncrona sin bloquear la respuesta
-        appendToSent({ raw, logger: req.log }).catch(err => {
-          req.log.warn({ reqId, error: err?.message }, '[IMAP] Append falló');
+        appendToSent({ raw, logger: req.log }).catch((err) => {
+          req.log.warn({ reqId, error: err?.message }, "[IMAP] Append falló");
         });
-        
-        req.log.info({ reqId }, '[IMAP] Append iniciado en background');
+
+        req.log.info({ reqId }, "[IMAP] Append iniciado en background");
       } catch (imapError) {
-        req.log.warn({ reqId, error: imapError?.message }, '[IMAP] Error preparando append');
+        req.log.warn(
+          { reqId, error: imapError?.message },
+          "[IMAP] Error preparando append"
+        );
       }
     }
 

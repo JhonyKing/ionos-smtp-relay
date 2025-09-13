@@ -28,6 +28,7 @@
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "helmet": "^7.1.0",
+    "imapflow": "^1.0.154",
     "nodemailer": "^6.9.8",
     "pino": "^8.17.2",
     "pino-http": "^8.6.1",
