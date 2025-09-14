@@ -10,7 +10,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "lint": "eslint . || true"
+    "lint": "eslint . || true",
+    "imap:check": "node scripts/imap-check.js"
   },
   "keywords": [
     "email",
